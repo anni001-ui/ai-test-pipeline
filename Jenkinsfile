@@ -2,11 +2,8 @@ pipeline {
     agent any
 
     stages {
-        // REMOVED the "Clone" stage because Jenkins does this automatically
-        
         stage('Install Dependencies') {
             steps {
-                // Using bat for Windows
                 bat 'pip install -r requirements.txt'
             }
         }
@@ -28,10 +25,18 @@ pipeline {
                             }
                         }
                     } else {
-                        error "priority_list.txt not found! Check if ai_prioritization.py is working correctly."
+                        error "priority_list.txt not found!"
                     }
                 }
             }
+        }
+    }
+
+    // The post block must be outside of stages
+    post {
+        always {
+            archiveArtifacts artifacts: 'priority_list.txt', fingerprint: true
+            echo "Build complete. AI Priority list has been archived."
         }
     }
 }
